@@ -134,7 +134,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'https://redesign-estore.vercel.app/',
-    'https://*',
-    'http://*'
+    'https://redesign-estore.vercel.app',
+    'https://redesign-estore-backend.ars-4.repl.co'
     ]
