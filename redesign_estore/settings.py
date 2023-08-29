@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -10,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-r=*=n7u5ohpo+r=+7-)jwajyvyv8%6*i3=a522f2_u_$i7%0jc'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or 'django-insecure-r=*=n7u5ohpo+r=+7-)jwajyvyv8%6*i3=a522f2_u_$i7%0jc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -133,3 +132,9 @@ AUTH_USER_MODEL = 'store.CustomUser'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'https://redesign-estore.vercel.app/',
+    'https://*',
+    'http://*'
+    ]

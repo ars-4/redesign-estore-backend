@@ -8,6 +8,8 @@ router.register('person', views.PersonViewSet, basename='Person')
 
 router.register('products', views.ProductViewSet, basename='Product')
 
+router.register('cart', views.CartViewSet, basename='Cart')
+
 
 urlpatterns = [
     path('', views.index, name='IndexPage'),
@@ -15,6 +17,8 @@ urlpatterns = [
     path('api/register/', views.register, name='Register'),
 
     path('api/faqs/<str:pk>/', views.get_faqs, name='FAQs'),
+    path('api/profile/', views.get_profile, name='Profile'),
+
 
     path('api/', include(router.urls))
 ]

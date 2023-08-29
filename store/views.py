@@ -18,12 +18,12 @@ def index(request):
 @api_view(["POST"])
 def login(request):
     data = request.data
-    username = data.get("username", None)
+    username = data.get("email", None)
     password = data.get("password", None)
 
     if username is None or password is None:
         return Response(
-            {"error": "Please provide both username and password"}, status=400
+            {"error": "Please provide both email and password"}, status=400
         )
 
     user = CustomUser.objects.get(email=username)
@@ -62,6 +62,18 @@ def register(request):
     country = address.split(',')[2]
     Person.objects.create(user=user, street=street, city=city, country=country, role=role, first_name=first_name, last_name=last_name, email=email)
     return Response({"user": user.email})
+
+
+@api_view(['GET'])
+def get_profile(request):
+    person = Person.objects.get(user=request.user)
+    personal_data = PersonSerializer(person, many=False)
+    orders = Order.objects.filter(cart__customer=person)[len(Order.objects.filter(cart__customer=person))-1]
+    order = OrderSerializer(orders, many=False)
+    return Response({
+        "personal_data": personal_data.data,
+        "order": order.data
+        })
 
 
 class PersonViewSet(ModelViewSet):
@@ -110,10 +122,46 @@ class CartViewSet(ModelViewSet):
     model = Cart
     serializer_class = CartSerializer
 
+    def create(self, request):
+        data = self.request.data
+        total_price = 0
+        cart = Cart.objects.create(
+            customer=Person.objects.get(user=request.user)
+        )
+        for prod in data.get("products"):
+            m_product=Product.objects.get(id=int(prod["id"]))
+            cart_product = CartProduct.objects.create(
+                product=m_product,
+                quantity=prod["qty"],
+                price=int(prod["qty"]) * int(m_product.price)
+            )
+            cart_product.save()
+            total_price += int(cart_product.price)
+            cart.cart_products.add(cart_product)
+        cart.total_price = total_price
+        cart.save()
+        serializer = CartSerializer(cart, many=False)
+        return Response(serializer.data, status=201)
+    
+
+
+
 
 class OrderViewSet(ModelViewSet):
     model = Order
     serializer_class = OrderSerializer
+
+    def create(self, request):
+        data = self.request.data
+        cart = Cart.objects.get(id=int(data.get("cart")))
+        order = Order.objects.create(
+            cart=cart,
+            delivery_status=data.get("delivery_status"),
+            payment_type=data.get("payment_type")
+        )
+        order.save()
+        serializer = OrderSerializer(order, many=False)
+        return Response(serializer.data, status=201)
 
 
 
